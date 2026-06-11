@@ -19,10 +19,15 @@ CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 
+if [ ! -f "Resources/AppIcon.icns" ]; then
+  ./scripts/generate-app-icon.swift
+fi
+
 rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 cp "$BIN_DIR/MacNTFSWriter" "$MACOS_DIR/$APP_NAME"
 cp "scripts/install-deps-macos.sh" "$RESOURCES_DIR/install-deps-macos.sh"
+cp "Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 chmod +x "$RESOURCES_DIR/install-deps-macos.sh"
 
 cat > "$CONTENTS_DIR/Info.plist" <<PLIST
@@ -36,6 +41,8 @@ cat > "$CONTENTS_DIR/Info.plist" <<PLIST
   <string>$APP_NAME</string>
   <key>CFBundleIdentifier</key>
   <string>$BUNDLE_ID</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleDisplayName</key>

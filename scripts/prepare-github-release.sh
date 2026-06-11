@@ -33,14 +33,14 @@ cat > "$RELEASE_DIR/RELEASE_NOTES.md" <<NOTES
 
 也可以下载 \`$APP_NAME-$VERSION.dmg\`，打开后把 NTFS Writer for Mac 拖到 Applications。
 
-首次使用如果提示缺少读写组件，请在应用内点击“打开安装窗口”。macFUSE 属于 macOS 系统扩展，系统要求用户手动允许并可能需要重启，这是正常流程。
+首次使用如果提示缺少读写组件，请在应用内点击“打开安装窗口”。安装过程中 macOS 可能要求用户在“系统设置 > 隐私与安全性”允许 NTFS 读写组件，并可能需要重启，这是正常流程。
 
 ## 注意
 
 - Windows 休眠、快速启动或未正常弹出的 NTFS 盘，建议先回 Windows 完全关机并运行 chkdsk /f。
 - “强制修复并挂载”会尝试移除 Windows 休眠文件，只应在确认不需要保留 Windows 休眠状态时使用。
 - 这是免费未签名版本。macOS 如果提示“无法验证开发者”，请右键点击 App/PKG 选择“打开”，或到“系统设置 > 隐私与安全性”选择“仍要打开”。
-- macFUSE 属于系统扩展，安装后必须由用户在“系统设置 > 隐私与安全性”手动允许，必要时重启。
+- 如果 macOS 提示需要允许系统软件，请到“系统设置 > 隐私与安全性”手动允许，必要时重启。
 NOTES
 
 echo "Prepared $RELEASE_DIR"
