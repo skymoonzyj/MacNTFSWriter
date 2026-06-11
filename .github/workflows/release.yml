@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version without the v prefix"
+        required: true
+        default: "0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build macOS DMG
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Using version $VERSION"
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Test
+        run: swift test
+
+      - name: Package release
+        shell: bash
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/prepare-github-release.sh "$VERSION"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacNTFSWriter-${{ env.VERSION }}-release
+          path: dist/release-${{ env.VERSION }}/*
+
+      - name: Create GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/release-${VERSION}/MacNTFSWriter-${VERSION}.dmg \
+            dist/release-${VERSION}/MacNTFSWriter-${VERSION}.pkg \
+            dist/release-${VERSION}/SHA256SUMS.txt \
+            dist/release-${VERSION}/README.md \
+            dist/release-${VERSION}/THIRD_PARTY_NOTICES.md \
+            --title "NTFS Writer for Mac ${VERSION}" \
+            --notes-file "dist/release-${VERSION}/RELEASE_NOTES.md"
